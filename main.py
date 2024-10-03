@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 
-from config import WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
+from config import LOGGER, WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
 from wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
 
 app = FastAPI()
@@ -16,10 +16,9 @@ async def wechat_hook_verification(msg_signature: str, timestamp: str, nonce: st
                                   WEWORK_ENCODING_AES_KEY, 
                                   WEWORK_CORPID)
 
-    print(WEWORK_TOKEN, WEWORK_ENCODING_AES_KEY, WEWORK_CORPID)
-
     ret, sEchoStr = msg_crypt.VerifyURL(msg_signature, timestamp, nonce, echostr)
-    print(f"VerifyURL ret: {ret}, sEchoStr: {sEchoStr}")
+
+    LOGGER.info(f"VerifyURL ret: {ret}, sEchoStr: {sEchoStr}")
     
     if ret == 0:
         from fastapi.responses import PlainTextResponse

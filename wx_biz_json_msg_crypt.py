@@ -2,10 +2,8 @@
 # -*- encoding:utf-8 -*-
 
 """ 对企业微信发送给企业后台的消息加解密示例代码.
-@copyright: Copyright (c) 1998-2020 Tencent Inc.
-
+代码从 python 2.x 升级到了 3.10
 """
-# ------------------------------------------------------------------------
 
 import base64
 import string
@@ -14,22 +12,12 @@ import hashlib
 import time
 import struct
 from Crypto.Cipher import AES
-import sys
 import socket
 import json
-
 import ierror
-
-"""
-关于Crypto.Cipher模块，ImportError: No module named 'Crypto'解决方案
-请到官方网站 https://www.dlitz.net/software/pycrypto/ 下载pycrypto。
-下载后，按照README中的“Installation”小节的提示进行pycrypto安装。
-"""
-
 
 class FormatException(Exception):
     pass
-
 
 def throw_exception(message, exception_class=FormatException):
     """my define raise exception function"""
@@ -52,11 +40,9 @@ class SHA1:
             sortlist.sort()
             sha = hashlib.sha1()
             joined = "".join(sortlist)
-            print(joined)
             sha.update(joined.encode("utf-8"))
             return ierror.WXBizMsgCrypt_OK, sha.hexdigest()
         except Exception as e:
-            print(e)
             return ierror.WXBizMsgCrypt_ComputeSignature_Error, None
 
 
@@ -80,7 +66,6 @@ class JsonParse:
             json_dict = json.loads(jsontext)
             return ierror.WXBizMsgCrypt_OK, json_dict["encrypt"]
         except Exception as e:
-            print(e)
             return ierror.WXBizMsgCrypt_ParseJson_Error, None
 
     def generate(self, encrypt, signature, timestamp, nonce):
@@ -280,8 +265,6 @@ class WXBizJsonMsgCrypt(object):
         if ret != 0:
             return ret, None
         if not signature == sMsgSignature:
-            print("signature not match")
-            print(signature)
             return ierror.WXBizMsgCrypt_ValidateSignature_Error, None
         pc = Prpcrypt(self.key)
         ret, json_content = pc.decrypt(encrypt, self.m_sReceiveId)

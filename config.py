@@ -16,6 +16,5 @@ WEWORK_TOKEN = os.getenv("WEWORK_TOKEN")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # 日志配置
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-LOG_FILE = os.getenv("LOG_FILE", "app.log")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+LOGGER = logging.getLogger(__name__)
