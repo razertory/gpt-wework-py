@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from config import WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
 from wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
@@ -12,8 +12,6 @@ async def ping():
 
 @app.get("/wechat/hook")
 async def wechat_hook_verification(msg_signature: str, timestamp: str, nonce: str, echostr: str):
-    # 这里需要实现企业微信服务器验证逻辑
-    # 验证成功后返回echostr
     msg_crypt = WXBizJsonMsgCrypt(WEWORK_TOKEN,
                                   WEWORK_ENCODING_AES_KEY, 
                                   WEWORK_CORPID)
@@ -22,7 +20,12 @@ async def wechat_hook_verification(msg_signature: str, timestamp: str, nonce: st
 
     ret, sEchoStr = msg_crypt.VerifyURL(msg_signature, timestamp, nonce, echostr)
     print(f"VerifyURL ret: {ret}, sEchoStr: {sEchoStr}")
-    return sEchoStr
+    
+    if ret == 0:
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(content=sEchoStr, media_type="text/plain;charset=utf-8")
+    else:
+        return JSONResponse(content={"error": "Verification failed"}, status_code=400)
 
 @app.post("/wechat/hook")
 async def wechat_hook_event(request: Request):
