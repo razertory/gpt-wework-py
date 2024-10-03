@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 
 from config import LOGGER, WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
-from wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
+from util.wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
 
 app = FastAPI()
 
