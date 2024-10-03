@@ -14,10 +14,12 @@ import hashlib
 import time
 import struct
 from Crypto.Cipher import AES
+import sys
 import socket
 import json
 
 import ierror 
+
 """
 关于Crypto.Cipher模块，ImportError: No module named 'Crypto'解决方案
 请到官方网站 https://www.dlitz.net/software/pycrypto/ 下载pycrypto。
@@ -45,7 +47,7 @@ class SHA1:
             sortlist = [token, timestamp, nonce, encrypt]
             sortlist.sort()
             sha = hashlib.sha1()
-            sha.update("".join(sortlist))
+            sha.update("".join(sortlist).encode('utf-8'))
             return  ierror.WXBizMsgCrypt_OK, sha.hexdigest()
         except Exception as e:
             print(e)
@@ -138,7 +140,7 @@ class Prpcrypt(object):
         @return: 加密得到的字符串
         """      
         # 16位随机字符串添加到明文开头
-        text = self.get_random_str() + struct.pack("I",socket.htonl(len(text))) + text + receiveid
+        text = self.get_random_str() + struct.pack("I",socket.htonl(len(text))) + text.encode('utf-8') + receiveid.encode('utf-8')
         # 使用自定义的填充方式对明文进行补位填充
         pkcs7 = PKCS7Encoder()
         text = pkcs7.encode(text)
@@ -147,7 +149,7 @@ class Prpcrypt(object):
         try:
             ciphertext = cryptor.encrypt(text)
             # 使用BASE64对加密后的字符串进行编码
-            return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext)
+            return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext).decode('utf-8')
         except Exception as e:
             print(e) 
             return  ierror.WXBizMsgCrypt_EncryptAES_Error,None
@@ -177,19 +179,18 @@ class Prpcrypt(object):
         except Exception as e:
             print(e)
             return  ierror.WXBizMsgCrypt_IllegalBuffer,None
-        if  from_receiveid != receiveid:
+        if  from_receiveid != receiveid.encode('utf-8'):
             print("receiveid not match")
             print(from_receiveid)
             return ierror.WXBizMsgCrypt_ValidateCorpid_Error,None
-        return 0,json_content
+        return 0,json_content.decode('utf-8')
     
     def get_random_str(self):
         """ 随机生成16位字符串
         @return: 16位字符串
         """ 
-        rule = string.letters + string.digits
-        str = random.sample(rule, 16)
-        return "".join(str)
+        rule = string.ascii_letters + string.digits
+        return "".join(random.choices(rule, k=16))
         
 class WXBizJsonMsgCrypt(object):
     #构造函数
@@ -216,7 +217,7 @@ class WXBizJsonMsgCrypt(object):
         ret,signature = sha1.getSHA1(self.m_sToken, sTimeStamp, sNonce, sEchoStr)
         if ret  != 0:
             return ret, None 
-        if not signature == sMsgSignature:
+        if signature != sMsgSignature:
             return ierror.WXBizMsgCrypt_ValidateSignature_Error, None
         pc = Prpcrypt(self.key)
         ret,sReplyEchoStr = pc.decrypt(sEchoStr,self.m_sReceiveId)
@@ -260,11 +261,10 @@ class WXBizJsonMsgCrypt(object):
         ret,signature = sha1.getSHA1(self.m_sToken, sTimeStamp, sNonce, encrypt)
         if ret  != 0:
             return ret, None 
-        if not signature == sMsgSignature:
+        if signature != sMsgSignature:
             print("signature not match")
             print(signature)
             return ierror.WXBizMsgCrypt_ValidateSignature_Error, None
         pc = Prpcrypt(self.key)
         ret,json_content = pc.decrypt(encrypt,self.m_sReceiveId)
         return ret,json_content 
-

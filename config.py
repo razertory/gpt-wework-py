@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 
@@ -9,6 +10,7 @@ WEWORK_TOKEN_API = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corps
 WEWORK_CORPID = os.getenv("WEWORK_CORPID")
 WEWORK_CORPSECRET = os.getenv("WEWORK_CORPSECRET")
 WEWORK_ENCODING_AES_KEY = os.getenv("WEWORK_ENCODING_AES_KEY")
+WEWORK_TOKEN = os.getenv("WEWORK_TOKEN")
 
 # 应用配置
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
