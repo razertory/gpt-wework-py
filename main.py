@@ -53,7 +53,7 @@ async def wechat_hook_event(
 
     msg_entities, has_more, next_cursor = select_msgs(cursor="", token=token_msg.Token)
 
-    last: WechatMsgEntity = msg_entities[len(msg_entities)-1]
+    last = msg_entities[len(msg_entities)-1]
 
     content = last.text.get('content')
 
