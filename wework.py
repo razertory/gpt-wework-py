@@ -15,6 +15,7 @@ from config import (
 import requests
 
 import xml.etree.ElementTree as ET
+from kv import set_cursor
 from schema import WeChatMessage, WechatMsgEntity, WechatMsgSendEntity
 from util.wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
 
@@ -70,6 +71,10 @@ def select_msgs(cursor: str, token: str) -> List[WechatMsgEntity]:
         )
         for msg in msgs
     ]
+
+    if next_cursor and has_more == 1:
+        set_cursor(next_cursor)
+
     return msg_entities, has_more == 1, next_cursor
 
 

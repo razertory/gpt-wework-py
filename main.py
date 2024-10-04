@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from ai import ai_reply
 from config import LOGGER, WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
+from kv import get_cursor
 from schema import WeChatMessage, WeChatTokenMessage, WechatMsgEntity, WechatMsgSendEntity
 from util.wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
 from wework import check_signature, parse_wechat_message, select_msgs, send_text_msg
@@ -51,7 +52,9 @@ async def wechat_hook_event(
 
     LOGGER.info(f"Received WeChat token message: {token_msg.model_dump_json()}")
 
-    msg_entities, has_more, next_cursor = select_msgs(cursor="", token=token_msg.Token)
+    cursor = get_cursor()
+
+    msg_entities, has_more, next_cursor = select_msgs(cursor=cursor, token=token_msg.Token)
 
     last = msg_entities[len(msg_entities)-1]
 
