@@ -49,7 +49,7 @@ async def wechat_hook_event(
 
     token_msg = WeChatTokenMessage.from_xml(xml_str=xml_content)
 
-    LOGGER.info("Received WeChat token message: %s", token_msg)
+    LOGGER.info(f"Received WeChat token message: {token_msg}")
 
     msg_entities, has_more, next_cursor = select_msgs(cursor="", token=token_msg.Token)
 

@@ -86,7 +86,7 @@ def _send_msg(entity: WechatMsgSendEntity):
         data=payload,
     )
 
-    LOGGER.info("ok to send msg with resp", resp, resp.content, payload)
+    LOGGER.info(f"ok to send msg with resp: {resp.status_code}, content: {resp.content}, payload: {payload}")
     return resp
 
 
