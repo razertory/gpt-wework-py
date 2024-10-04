@@ -20,24 +20,17 @@ class WeChatTokenMessage(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-    
+
     @classmethod
-    def from_xml(self, xml_str: str):
+    def from_xml(cls, xml_str: str):
         root = ET.fromstring(xml_str)
+        data = {}
         for child in root:
-            if child.tag == 'ToUserName':
-                self.ToUserName = child.text
-            elif child.tag == 'CreateTime':
-                self.CreateTime = int(child.text)
-            elif child.tag == 'MsgType':
-                self.MsgType = child.text
-            elif child.tag == 'Event':
-                self.Event = child.text
-            elif child.tag == 'Token':
-                self.Token = child.text
-            elif child.tag == 'OpenKfId':
-                self.OpenKfId = child.text
-        return self
+            if child.tag == 'CreateTime':
+                data[child.tag] = int(child.text)
+            else:
+                data[child.tag] = child.text
+        return cls(**data)
     
 class WeChatTextMessage(BaseModel):
     ToUserName: str = Field(..., description="接收消息的用户")
