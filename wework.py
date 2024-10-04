@@ -64,7 +64,7 @@ def select_msgs(cursor: str, token: str) -> List[WechatMsgEntity]:
     next_cursor = resp_data.get("next_cursor")
     msg_entities = [
         WechatMsgEntity(
-            **msg,
+            **{k: v for k, v in msg.items() if k not in ['open_kfid', 'external_userid']},
             open_kfid=msg.get('open_kfid', ''),
             external_userid=msg.get('external_userid', '')
         )
