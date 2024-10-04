@@ -166,7 +166,6 @@ class Prpcrypt(object):
             print(e)
             return ierror.WXBizMsgCrypt_DecryptAES_Error, None
         try:
-            print(plain_text)
             # 修改这里：直接使用最后一个字节的值作为 pad
             pad = plain_text[-1]
             # 去掉补位字符串
