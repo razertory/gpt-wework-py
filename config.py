@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # WeWork 配置
-WEWORK_TOKEN_API = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s"
+WEWORK_TOKEN_API = "https://qyapi.weixin.qq.com/cgi-bin/gettoken"
 WEWORK_CORPID = os.getenv("WEWORK_CORPID")
 WEWORK_CORPSECRET = os.getenv("WEWORK_CORPSECRET")
 WEWORK_ENCODING_AES_KEY = os.getenv("WEWORK_ENCODING_AES_KEY")

@@ -247,19 +247,14 @@ class WXBizJsonMsgCrypt(object):
         jsonParse = JsonParse()
         return ret, jsonParse.generate(encrypt, signature, timestamp, sNonce)
 
-    def DecryptMsg(self, sPostData, sMsgSignature, sTimeStamp, sNonce):
+    def DecryptMsg(self, encrypt, sMsgSignature, sTimeStamp, sNonce):
         # 检验消息的真实性，并且获取解密后的明文
         # @param sMsgSignature: 签名串，对应URL参数的msg_signature
         # @param sTimeStamp: 时间戳，对应URL参数的timestamp
         # @param sNonce: 随机串，对应URL参数的nonce
-        # @param sPostData: 密文，对应POST请求的数据
-        #  json_content: 解密后的原文，当return返回0时有效
+        #json_content: 解密后的原文，当return返回0时有效
         # @return: 成功0，失败返回对应的错误码
         # 验证安全签名
-        jsonParse = JsonParse()
-        ret, encrypt = jsonParse.extract(sPostData)
-        if ret != 0:
-            return ret, None
         sha1 = SHA1()
         ret, signature = sha1.getSHA1(self.m_sToken, sTimeStamp, sNonce, encrypt)
         if ret != 0:
@@ -267,5 +262,5 @@ class WXBizJsonMsgCrypt(object):
         if not signature == sMsgSignature:
             return ierror.WXBizMsgCrypt_ValidateSignature_Error, None
         pc = Prpcrypt(self.key)
-        ret, json_content = pc.decrypt(encrypt, self.m_sReceiveId)
-        return ret, json_content
+        ret, xml_content = pc.decrypt(encrypt, self.m_sReceiveId)
+        return ret, xml_content
