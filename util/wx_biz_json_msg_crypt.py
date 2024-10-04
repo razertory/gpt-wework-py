@@ -161,7 +161,6 @@ class Prpcrypt(object):
             # 使用BASE64对密文进行解码，然后AES-CBC解密
             print('TEXT', text)
             decoded = base64.b64decode(text)
-            print("decoded", decoded)
             plain_text = cryptor.decrypt(decoded)
         except Exception as e:
             print(e)

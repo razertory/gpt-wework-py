@@ -51,8 +51,7 @@ def select_msgs(cursor: str, token: str) -> List[WechatMsgEntity]:
         },
         data=json.dumps(
             {
-                "limit": 1000,
-                "token": token
+                "limit": 1000
             }
         )
     )
