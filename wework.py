@@ -20,6 +20,8 @@ from util.wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
 
 token_cache = {}
 
+msg_retry_cache = {}
+
 
 async def parse_wechat_message(request: Request) -> WeChatMessage:
     body = await request.body()
@@ -65,7 +67,9 @@ def select_msgs(cursor: str, token: str) -> List[WechatMsgEntity]:
 
 
 # 发送消息给用户
-def send_text_msg(external_user_id, kf_id, content): 
+def send_text_msg(msg_id, external_user_id, kf_id, content): 
+    if msg_id in msg_retry_cache:
+        return 
     _send_msg(
         WechatMsgSendEntity(
             touser=external_user_id,
@@ -76,6 +80,7 @@ def send_text_msg(external_user_id, kf_id, content):
             }
         )
     )
+    msg_retry_cache[msg_id] = time.time()
 
 def _send_msg(entity: WechatMsgSendEntity):
     payload = entity.model_dump_json()
