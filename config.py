@@ -11,6 +11,7 @@ WEWORK_CORPID = os.getenv("WEWORK_CORPID")
 WEWORK_CORPSECRET = os.getenv("WEWORK_CORPSECRET")
 WEWORK_ENCODING_AES_KEY = os.getenv("WEWORK_ENCODING_AES_KEY")
 WEWORK_TOKEN = os.getenv("WEWORK_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # 应用配置
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"

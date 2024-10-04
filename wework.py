@@ -43,25 +43,45 @@ def check_signature(msg_signature, timestamp, nonce, echostr):
     return ret, sEchoStr
 
 
-def select_msgs() -> List[WechatMsgEntity]:
+def select_msgs(cursor: str, token: str) -> List[WechatMsgEntity]:
     resp = requests.post(
         "https://qyapi.weixin.qq.com/cgi-bin/kf/sync_msg",
         params={
-            "access_token": cachable_token()
-        }
+            "access_token": _cachable_token()
+        },
+        data=json.dumps(
+            {
+                "limit": 1000,
+            }
+        )
     )
     resp_data = resp.json()
     msgs = resp_data.get("msg_list", [])
+    has_more = resp_data.get("has_more", 0)
+    next_cursor = resp_data.get("next_cursor")
     msg_entities = [WechatMsgEntity(**msg) for msg in msgs]
-    return msg_entities
+    return msg_entities, has_more == 1, next_cursor
 
 
-def send_msg(entity: WechatMsgSendEntity):
+# 发送消息给用户
+def send_text_msg(external_user_id, kf_id, content): 
+    _send_msg(
+        WechatMsgSendEntity(
+            touser=external_user_id,
+            open_kfid=kf_id,
+            msgtype="text",
+            text={
+                "content": content
+            }
+        )
+    )
+
+def _send_msg(entity: WechatMsgSendEntity):
     payload = entity.model_dump_json()
     resp = requests.post(
         "https://qyapi.weixin.qq.com/cgi-bin/kf/send_msg",
         params={
-            "access_token": cachable_token()
+            "access_token": _cachable_token()
         },
         data=payload,
     )
@@ -71,7 +91,7 @@ def send_msg(entity: WechatMsgSendEntity):
 
 
 # 可以缓存的token
-def cachable_token():
+def _cachable_token():
     current_time = time.time()
     if (
         not "token" in token_cache.keys()

@@ -1,10 +1,11 @@
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 
+from ai import ai_reply
 from config import LOGGER, WEWORK_CORPID, WEWORK_ENCODING_AES_KEY, WEWORK_TOKEN
 from schema import WeChatMessage, WeChatTokenMessage, WechatMsgSendEntity
 from util.wx_biz_json_msg_crypt import WXBizJsonMsgCrypt
-from wework import check_signature, parse_wechat_message, select_msgs, send_msg
+from wework import check_signature, parse_wechat_message, select_msgs, send_text_msg
 
 
 app = FastAPI()
@@ -48,25 +49,17 @@ async def wechat_hook_event(
 
     token_msg = WeChatTokenMessage.from_xml(xml_str=xml_content)
 
-    token_msg.Token
+    msg_entities, has_more, next_cursor = select_msgs(cursor="", token=token_msg.Token)
 
-    msg_entities = select_msgs()
+    last = msg_entities[len(msg_entities)-1]
 
-    first = msg_entities[0]
+    content = last.text.get('content')
 
-    content = first.text.get('content')
-
-    send_msg(
-        WechatMsgSendEntity(
-            touser=first.external_userid,
-            open_kfid=first.open_kfid,
-            msgtype="text",
-            text={
-                "content": content + "瓜娃子"
-            }
-        )
+    send_text_msg(
+        last.external_userid,
+        last.open_kfid,
+        ai_reply(content)
     )
-
 
     # 在这里处理消息数据
     return JSONResponse(content={"message": "Event received"})
